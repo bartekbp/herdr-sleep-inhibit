@@ -35,8 +35,8 @@ is inhibited. Set `INHIBIT_IDLE=1` if you want the screen kept awake too.
 ## Install
 
 ```sh
-git clone https://github.com/bartekbp/herdr-sleep-inhibit ~/repo/herdr-sleep-inhibit
-cd ~/repo/herdr-sleep-inhibit
+git clone https://github.com/bartekbp/herdr-sleep-inhibit
+cd herdr-sleep-inhibit
 ./install.sh
 ```
 
