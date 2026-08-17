@@ -15,13 +15,15 @@ platforms = ["linux"]
 # is deduplicated by a flock, so repeated events are no-ops, and so is a hook
 # fired while the systemd unit is already running the daemon.
 
-# Covers a herdr restart, and is the only event needed when panes are restored
-# with agents already working.
-[[events]]
-on = "app.startup"
+# Runs once when herdr starts, which covers a herdr restart and panes restored
+# with agents already working. This is the main entry point when the systemd unit
+# is not installed.
+[[startup]]
 command = ["/bin/sh", "inhibit.sh", "hook"]
+platforms = ["linux"]
 
-# Covers a plugin enabled or installed while herdr is already up.
+# Covers a plugin enabled or installed while herdr is already up, and a daemon
+# that was stopped by hand.
 [[events]]
 on = "pane.agent_detected"
 command = ["/bin/sh", "inhibit.sh", "hook"]
