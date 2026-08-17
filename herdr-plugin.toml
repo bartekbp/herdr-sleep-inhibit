@@ -1,0 +1,59 @@
+id = "sleep-inhibit"
+name = "Sleep Inhibit"
+version = "2.0.0"
+min_herdr_version = "0.8.0"
+description = "Keep the machine awake while any herdr agent pane is actively working."
+platforms = ["linux"]
+
+# herdr spawns plugin commands with no shell and with the server's PATH, so every
+# command goes through an absolute /bin/sh and the script resolves the herdr
+# binary itself.
+#
+# Events only ever *start* the daemon; the daemon polls agent state and manages
+# the hold on its own. A dropped or never-delivered event therefore cannot leave
+# the machine free to suspend mid-run, and cannot pin it awake either. Every hook
+# is deduplicated by a flock, so repeated events are no-ops, and so is a hook
+# fired while the systemd unit is already running the daemon.
+
+# Covers a herdr restart, and is the only event needed when panes are restored
+# with agents already working.
+[[events]]
+on = "app.startup"
+command = ["/bin/sh", "inhibit.sh", "hook"]
+
+# Covers a plugin enabled or installed while herdr is already up.
+[[events]]
+on = "pane.agent_detected"
+command = ["/bin/sh", "inhibit.sh", "hook"]
+
+[[events]]
+on = "pane.agent_status_changed"
+command = ["/bin/sh", "inhibit.sh", "hook"]
+
+[[actions]]
+id = "status"
+title = "Sleep Inhibit: status"
+description = "Show whether the machine is currently held awake and which agents are working."
+contexts = ["global"]
+command = ["/bin/sh", "inhibit.sh", "status"]
+
+[[actions]]
+id = "stop"
+title = "Sleep Inhibit: stop"
+description = "Stop the daemon and release any hold."
+contexts = ["global"]
+command = ["/bin/sh", "inhibit.sh", "stop"]
+
+[[actions]]
+id = "start"
+title = "Sleep Inhibit: start"
+description = "Start the daemon if it is not already running."
+contexts = ["global"]
+command = ["/bin/sh", "inhibit.sh", "hook"]
+
+[[actions]]
+id = "logs"
+title = "Sleep Inhibit: logs"
+description = "Print recent sleep-inhibit log lines."
+contexts = ["global"]
+command = ["/bin/sh", "inhibit.sh", "logs"]

@@ -1,0 +1,20 @@
+[Unit]
+Description=Block sleep while herdr AI agents are working
+Documentation=https://github.com/bartekbp/herdr-sleep-inhibit
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+# herdr lives in ~/.local/bin and the unit does not inherit an interactive PATH.
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/bin/sh @SCRIPT@ daemon
+Restart=on-failure
+RestartSec=5
+# The default control-group kill mode also reaps the inhibitor chain, so a
+# SIGKILLed daemon cannot leak a hold.
+KillMode=control-group
+TimeoutStopSec=15
+
+[Install]
+WantedBy=graphical-session.target
